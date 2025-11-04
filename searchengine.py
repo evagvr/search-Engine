@@ -25,7 +25,7 @@ def run_search(query):
             summary= True,
         )
 
-        print(f"Searching for: {query}")
+        print(f"Results for: {query}")
         
         if not response.results:
             print("No results found")

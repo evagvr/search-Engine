@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 public class GUIsearchEngine extends JFrame implements ActionListener {
     private JTextField searchField;
     private JPanel resultsArea;
-    private JButton searchButton;
+    private RoundedButton searchButton;
     private JLabel loadingLabel;
     
 
@@ -21,22 +21,26 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+
         JPanel topPanel = new JPanel();
-        topPanel.setBackground(new Color(226, 201,158));
+        topPanel.setBackground(new Color(65,75,158));
         topPanel.setLayout(new FlowLayout());
 
         searchField = new JTextField(30);
-        searchButton = new JButton("Search");
+        searchButton = new RoundedButton("Search");
 
-        searchButton.setBackground(new Color(133, 39, 54));
-        searchButton.setForeground(new Color(226, 201,158));
+        searchButton.setBackground(new Color(151,146,203));
+        searchButton.setForeground(new Color(65, 75,158));
         searchButton.setFont(new Font("Arial", Font.BOLD, 15));
         searchButton.setBorder(null);
+        searchButton.setPreferredSize(new Dimension(70, 20));
 
         searchButton.addActionListener(this);
         searchField.addActionListener(this);
-
-        topPanel.add(new JLabel("Type..."));
+        
+        JLabel typeText = new JLabel("Type here");
+        typeText.setForeground(Color.WHITE);
+        topPanel.add(typeText);
         topPanel.add(searchField);
         topPanel.add(searchButton);
 
@@ -102,7 +106,7 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
                 try (BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()))) {
                     String line;
                     while ((line = errorReader.readLine()) != null) {
-                        publish("ERROR_STREAM|" + line); // Marcăm mesajul ca eroare
+                        publish("ERROR_STREAM|" + line);
                     }
                 }
             }
