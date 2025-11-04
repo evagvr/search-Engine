@@ -22,7 +22,6 @@ def run_search(query):
             query, 
             num_results=20, 
             type='auto', 
-            include_domains=['https://www.tiktok.com'],
             summary= True,
         )
 

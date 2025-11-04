@@ -13,6 +13,7 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
     private JPanel resultsArea;
     private JButton searchButton;
     private JLabel loadingLabel;
+    
 
     public GUIsearchEngine(){
         setTitle("Search Engine");
@@ -33,6 +34,7 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
         searchButton.setBorder(null);
 
         searchButton.addActionListener(this);
+        searchField.addActionListener(this);
 
         topPanel.add(new JLabel("Type..."));
         topPanel.add(searchField);
@@ -57,7 +59,7 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e){
-        if(e.getSource() == searchButton){
+        if(e.getSource() == searchButton || e.getSource()== searchField){
             String searchTerm = searchField.getText();
             
             searchButton.setEnabled(false);
@@ -127,6 +129,10 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
                     String title = parts[0].trim();
                     String url = parts[1].trim();
                     String snippet = parts[2].trim();
+                    JLabel summaryLabel = new JLabel("<html><p style='width: 500px;'>" + snippet + "</p></html>");
+
+                    summaryLabel.setForeground(Color.BLACK);
+                    summaryLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
                     JPanel resultItemPanel = new JPanel();
 
                     resultItemPanel.setLayout(new BoxLayout(resultItemPanel, BoxLayout.Y_AXIS));
@@ -135,13 +141,9 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
 
                     hyperlinkLabel link = new hyperlinkLabel(title, url);
                     link.setAlignmentX(Component.LEFT_ALIGNMENT);
-
-                    JLabel snippetLabel = new JLabel(snippet);
-                    snippetLabel.setForeground(Color.BLACK);
-                    snippetLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
                     
                     resultItemPanel.add(link);
-                    resultItemPanel.add(snippetLabel);
+                    resultItemPanel.add(summaryLabel);
 
                     resultsArea.add(resultItemPanel);
                     resultsArea.add(Box.createVerticalStrut(10));
