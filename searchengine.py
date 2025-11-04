@@ -3,6 +3,9 @@ import os
 from dotenv import load_dotenv
 from exa_py import Exa
 
+sys.stdout.reconfigure(encoding='utf-8')
+sys.stderr.reconfigure(encoding='utf-8')
+
 load_dotenv()
 
 EXA_API_KEY = os.getenv('EXA_API_KEY')
@@ -15,11 +18,12 @@ def run_search(query):
     try:
         exa = Exa(EXA_API_KEY)
 
-        response = exa.search(
+        response = exa.search_and_contents(
             query, 
             num_results=20, 
-            type='keyword', 
-            include_domains=['https://www.tiktok.com']
+            type='auto', 
+            include_domains=['https://www.tiktok.com'],
+            summary= True,
         )
 
         print(f"Searching for: {query}")
@@ -29,7 +33,8 @@ def run_search(query):
             return
 
         for i, result in enumerate(response.results):
-            print(f"{result.title}|{result.url}")
+            snippet = result.summary if result.summary else ""
+            print(f"{result.title}|{result.url}|{snippet}")
 
     except Exception as e:
         print(f"Exa execution error: {e}", file=sys.stderr)
