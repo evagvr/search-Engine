@@ -1,4 +1,3 @@
-import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -8,22 +7,29 @@ import java.awt.event.ActionListener;
 
 
 
+
 public class GUIsearchEngine extends JFrame implements ActionListener {
     private JTextField searchField;
-    private JTextArea resultsArea;
+    private JPanel resultsArea;
     private JButton searchButton;
 
     public GUIsearchEngine(){
-        setTitle("Motor Cautare");
+        setTitle("Search Engine");
         setSize(600,400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel();
+        topPanel.setBackground(new Color(226, 201,158));
         topPanel.setLayout(new FlowLayout());
 
         searchField = new JTextField(30);
         searchButton = new JButton("Search");
+
+        searchButton.setBackground(new Color(133, 39, 54));
+        searchButton.setForeground(new Color(226, 201,158));
+        searchButton.setFont(new Font("Arial", Font.BOLD, 15));
+        searchButton.setBorder(null);
 
         searchButton.addActionListener(this);
 
@@ -31,12 +37,12 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
         topPanel.add(searchField);
         topPanel.add(searchButton);
 
-        resultsArea = new JTextArea();
-        resultsArea.setEditable(false);
-        JScrollPane scrollPane = new JScrollPane(resultsArea);
+        resultsArea = new JPanel();
+        resultsArea.setLayout(new BoxLayout(resultsArea, BoxLayout.Y_AXIS)); 
+        resultsArea.setBackground(Color.WHITE);
 
         add(topPanel, BorderLayout.NORTH);
-        add(scrollPane, BorderLayout.CENTER);
+        add(resultsArea, BorderLayout.CENTER);
 
         setVisible(true);
     }
@@ -44,7 +50,10 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
     public void actionPerformed(ActionEvent e){
         if(e.getSource() == searchButton){
             String searchTerm = searchField.getText();
-            resultsArea.setText("Searching results for: " + searchTerm + "..\n");
+            resultsArea.removeAll(); // Curăță rezultatele anterioare
+            resultsArea.add(new JLabel("Searching results for: " + searchTerm + "...\n"));
+            resultsArea.revalidate();
+            resultsArea.repaint();
             callPythonScript(searchTerm);
         }
     }
@@ -58,25 +67,42 @@ public class GUIsearchEngine extends JFrame implements ActionListener {
 
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             String line;
-            StringBuilder output = new StringBuilder();
+            resultsArea.removeAll();
 
             while((line = reader.readLine()) != null){
-                output.append(line).append("\n");
+                String[] parts = line.split("\\|", 2); 
+                
+                if (parts.length == 2) {
+                    String title = parts[0].trim();
+                    String url = parts[1].trim();
+
+                    hyperlinkLabel link = new hyperlinkLabel(title, url);
+                    resultsArea.add(link);
+                    resultsArea.add(Box.createVerticalStrut(5));
+                } else {
+                    resultsArea.add(new JLabel(line));
+                }
             }
             int exitCode = p.waitFor();
 
             if (exitCode == 0){
-                resultsArea.setText(output.toString());
+                resultsArea.revalidate(); 
+                resultsArea.repaint();
             } else {
                 BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
                 StringBuilder errorOutput = new StringBuilder();
                 while ((line = errorReader.readLine()) != null) {
                     errorOutput.append(line).append("\n");
                 }
-                resultsArea.setText("Error: Python Script");
+                resultsArea.removeAll();
+                resultsArea.add(new JLabel("<html><font color='red'>Eroare Script Python:</font></html>"));
+                resultsArea.add(new JLabel(errorOutput.toString()));
+                resultsArea.revalidate(); 
+                resultsArea.repaint();
             }
         } catch (Exception ex){
-            resultsArea.setText("Eroare la rularea scriptului");
+            resultsArea.removeAll();
+            resultsArea.add(new JLabel("<html><font color='red'>Eroare Java la rularea scriptului: </font></html>" + ex.getMessage()));
             ex.printStackTrace();
         }
     }
